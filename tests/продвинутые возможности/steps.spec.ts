@@ -21,7 +21,14 @@ test.describe('Тестирование формы регистрации', () =
     // - Секция профиля не отображается
 
     await test.step('TODO(student): ПРЕДУСЛОВИЯ', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ПРЕДУСЛОВИЯ" по инструкции выше');
+      await expect(page.locator('#username')).toHaveValue('');
+      await expect(page.locator('#email')).toHaveValue('');
+      await expect(page.locator('#password')).toHaveValue('');
+
+      await expect(page.locator('#error-message')).toBeHidden();
+      await expect(page.locator('#success-message')).toBeHidden();
+
+      await expect(page.locator('.profile-section')).toBeHidden();
     });
 
     // Создай test.step ШАГ 1: Попытка регистрации с пустыми полями
@@ -33,7 +40,14 @@ test.describe('Тестирование формы регистрации', () =
     // - Сообщение об успехе осталось скрытым
 
     await test.step('TODO(student): ШАГ 1', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ШАГ 1" по инструкции выше');
+      await page.getByRole('button', { name: 'Зарегистрироваться' }).click();
+
+      await expect(page.locator('#error-message')).toBeVisible();
+      await expect(page.locator('#error-message')).toHaveText(
+        'Все поля обязательны для заполнения',
+      );
+
+      await expect(page.locator('#success-message')).toBeHidden();
     });
 
     // Создай test.step ШАГ 2: Попытка регистрации с некорректными данными
@@ -46,7 +60,15 @@ test.describe('Тестирование формы регистрации', () =
     // - Соответствующие сообщения об ошибках
 
     await test.step('TODO(student): ШАГ 2', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ШАГ 2" по инструкции выше');
+      await page.locator('#username').fill('John');
+      await page.locator('#email').fill('johnemail.com');
+      await page.locator('#password').fill('5');
+
+      await page.getByRole('button', { name: 'Зарегистрироваться' }).click();
+
+      await expect(page.locator('#error-message')).toHaveText(
+        'Пароль должен быть не менее 6 символов',
+      );
     });
 
     // Создай test.step ШАГ 3: Успешная регистрация
@@ -59,7 +81,16 @@ test.describe('Тестирование формы регистрации', () =
     // - Отобразилась секция профиля
 
     await test.step('TODO(student): ШАГ 3', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ШАГ 3" по инструкции выше');
+      await page.locator('#username').fill('JohnDoe');
+      await page.locator('#email').fill('john@email.com');
+      await page.locator('#password').fill('john789');
+
+      await page.getByRole('button', { name: 'Зарегистрироваться' }).click();
+
+      await expect(page.locator('#error-message')).toBeHidden();
+      await expect(page.locator('#success-message')).toBeVisible();
+      await expect(page.locator('#welcome-user')).toHaveText('JohnDoe');
+      await expect(page.locator('.profile-section')).toBeVisible();
     });
 
     // Создай test.step ШАГ 4: Проверка данных профиля
@@ -68,7 +99,8 @@ test.describe('Тестирование формы регистрации', () =
     // - Данные в профиле соответствуют введенным при регистрации
 
     await test.step('TODO(student): ШАГ 4', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ШАГ 4" по инструкции выше');
+      await expect(page.locator('#profile-username')).toHaveText('JohnDoe');
+      await expect(page.locator('#profile-username')).toHaveText('john@email.com');
     });
 
     // Создай test.step ШАГ 5: Выход из системы
@@ -79,7 +111,14 @@ test.describe('Тестирование формы регистрации', () =
     // - Форма регистрации сброшена
     // - Секция профиля скрыта
     await test.step('TODO(student): ШАГ 5', async () => {
-      throw new Error('TODO(student): реализуйте шаг "ШАГ 5" по инструкции выше');
+      await page.getByRole('button', { name: 'Выйти' }).click();
+
+      await expect(page.locator('.auth-form')).toBeVisible();
+      await expect(page.locator('#username')).toHaveValue('');
+      await expect(page.locator('#email')).toHaveValue('');
+      await expect(page.locator('#password')).toHaveValue('');
+
+      await expect(page.locator('.profile-section')).toBeHidden();
     });
   });
 
