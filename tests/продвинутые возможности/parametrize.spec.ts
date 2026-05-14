@@ -28,6 +28,31 @@ test.describe('Параметризованные тесты формы вход
   // 4. Нажать кнопку "Войти"
   // 5. Проверить сообщение системы
   // 6. Проверить класс сообщения (success/error)
+  loginTestCases.forEach(({ username, password, expected }) => {
+    test(`Тест входа: ${username || 'пусто'}/${password} → ${expected}`, async ({ page }) => {
+      await page.goto('https://osstep.github.io/parametrize');
+
+      await test.step('Заполнить форму входа', async () => {
+        if (username) {
+          await page.getByRole('textbox', { name: 'Имя пользователя' }).fill(username);
+        }
+        await page.getByRole('textbox', { name: 'Пароль' }).fill(password);
+      });
+
+      test('Отправить форму', async () => {
+        await page.getByRole('button', { name: 'Войти' }).click();
+      });
+
+      test('Проверить результат', async () => {
+        const msg = page.locator('#message');
+        await expect(msg).toBeVisible();
+        await expect(msg).toHaveText(expected);
+
+        const expectedClass = expected === 'Успешный вход!' ? 'success' : 'error';
+        await expect(msg).toHaveClass(new RegExp(expectedClass));
+      });
+    });
+  });
 });
 
 // Тесты для калькулятора
@@ -44,4 +69,24 @@ test.describe('Параметризованные тесты калькулят�
   // 3. Ввести второе число
   // 4. Нажать кнопку операции (сложение/умножение)
   // 5. Проверить результат вычисления
+  calculatorTestCases.forEach(({ a, b, operation, expected }) => {
+    test(`Операция ${operation} для ${a} и ${b} → ${expected}`, async ({ page }) => {
+      await page.goto('https://osstep.github.io/parametrize');
+
+      await test.step('Ввести числа', async () => {
+        await page.fill('#num1', a.toString());
+        await page.fill('#num2', b.toString());
+      });
+
+      await test.step('Выполнить операцию', async () => {
+        const button = operation === 'add' ? '#add-btn' : '#multiply-btn';
+        await page.click(button);
+      });
+
+      await test.step('Проверить результат', async () => {
+        const resultText = await page.locator('#result').innerText();
+        expect(resultText).toBe(`Результат: ${expected}`);
+      });
+    });
+  });
 });
